@@ -697,7 +697,9 @@ being unknown).
 =over 4
 
 =item :type=hash
+
 =item :type=queue
+
 =item :type=stack
 
 Given a hash or array referent as input these default to 
@@ -716,6 +718,7 @@ data at each stage.
 
 
 =item :verbose
+
 =item :verbose=1
 
 Defaults to one if provided, use ":verbose=0" to turn it
@@ -738,7 +741,9 @@ development.
 =over 4
 
 =item :debug
+
 =item :debug=1
+
 =item :debug=2
 
 Defaults to zero normally, to one if provided. This is
@@ -753,6 +758,7 @@ or
 This is also mainly for use in #! code (see :verbose, above).
 
 =item :export
+
 =item :export=1
 
 Controls whether the symbols are exported after the 
