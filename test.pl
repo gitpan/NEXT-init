@@ -135,8 +135,6 @@ ok @$obj7  == 4,        '@$obj7 == 4';
 ok ref $obj7->[0] eq 'HASH',  '$obj7->[0] is a hash';
 ok $obj7->[-1] eq 'c', '$obj7->[-1] eq c'; 
 
-$DB::single = 1;
-
 my $obj8 = Queue->construct( qw( queue ) );
 
 my $obj9 = Stack->construct( qw( stack ) );

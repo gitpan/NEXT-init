@@ -3,13 +3,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
 	NAME            => 'NEXT::init',
-	VERSION         => '1.01',
+	VERSION         => '1.02',
 	ABSTRACT		=> <<'END',
 
-Automate inherited initialization of array and hash data
-via $obj->EVERY::LAST::init. Generates and installs an 
-'init' method (via closure) and metadata from its arguments
-in the calling class.
+DWIM data inheritence for hashes and arrays.
 
 END
 
@@ -20,5 +17,6 @@ END
 
 		strict    => 0,
 		warnings  => 0,
+		NEXT      => 0,
 	},
 );
