@@ -1,0 +1,107 @@
+Most recent changes on top.
+
+Sat Sep 25 01:28:29 EDT 2004
+
+- Single array type didn't cut it. Split them into queue and 
+  stack. Both push the data at each step, queue uses EVERY::init
+  stack uses EVERY::LAST::init. 
+
+  Difference is that given a base class with qw( a b c ) and 
+  derived of qw( d e f ) the stack ends up with qw( d e f a b c )
+  where the queue has qw( a b c d e f ).
+
+  From test.pl:
+
+  Given:
+
+	package MyArray;
+
+	use NEXT::init [ qw( a b c ) ];
+
+	package Queue;
+
+	use base qw( MyArray );
+
+	use NEXT::init qw( :type=queue d e f );
+
+	package Stack;
+
+	use base qw( MyArray );
+
+	use NEXT::init qw( :type=stack d e f );
+
+  Running the code:
+
+	my $obj8 = Queue->construct( qw( queue ) );
+
+	my $obj9 = Stack->construct( qw( stack ) );
+
+  Yields:
+
+	Queue vs. Stack:
+
+	bless( [
+	  'queue',
+	  'd',
+	  'e',
+	  'f',
+	  'a',
+	  'b',
+	  'c'
+	], 'Queue' )
+
+
+	bless( [
+	  'a',
+	  'b',
+	  'c',
+	  'd',
+	  'e',
+	  'f',
+	  'stack'
+	], 'Stack' )
+
+- Removed merge, the constructor and a single init are 
+  all that's required. 
+
+- *meta is reused for both the data (hash or array) and 
+  a method that returns the referent. Main use of the 
+  sub is to get something un-blessed to determine the 
+  base data type to use for an object.
+
+- init's use @{*$meta} and %{*$meta} to grab current
+  values -- original code used the internal data referent
+  which led to static data. This allows a class that 
+  uses N::i to modify its metadata on the fly and have 
+  new object utilize the updated data.
+
+- Base data types (ones without a use base that involves
+  N::i) must be passed as referents or specified via 
+  :type=[hash|queue|stack]. This ensures that the
+  data is initialized properly. Probably the simplest 
+  way is to pass the most-basic data as referents in all
+  cases and use the 'stack' type only when necessary
+  (arrays default to queue). After that use simple lists
+  for derived types and let the import handle the rest 
+  for itself.
+
+- Comments.
+
+- POD.
+
+Tue Sep  7 18:57:45 EDT 2004
+
+- Replace no strict 'refs' with Symbol.
+
+- Comments.
+
+- Arg's can now be :foo=bar to set base type of object.
+
+- Install &meta to return metadata referent. Allows
+  ref $obj->meta to get a base type for data-less objects.
+
+
+Fri Aug 13 15:10:08 EDT 2004
+
+- Initial release. Code tested in-house,
+  interface seems stable.
