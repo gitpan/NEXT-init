@@ -1,5 +1,12 @@
 Most recent changes on top.
 
+Sun Jun  5 22:29:59 EDT 2005
+
+- Replace eval's of datatypes to get base data type with
+  Scalar::Util. That module is stable enough to be reasonably
+  installed along with this one and simplifies this code quite a bit.
+
+
 Tue Sep 28 14:20:05 EDT 2004
 
 - Fix POD typos.

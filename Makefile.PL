@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
 	NAME            => 'NEXT::init',
-	VERSION         => '1.03',
+	VERSION         => '1.04',
 	ABSTRACT		=> <<'END',
 
 DWIM data inheritence for hashes and arrays.
@@ -15,8 +15,9 @@ END
 		# standard distro, particular versions 
 		# are unlikely to cause pain.
 
-		strict    => 0,
-		warnings  => 0,
-		NEXT      => 0,
+		strict          => 0,
+		warnings        => 0,
+		NEXT            => 0,
+        Scalar::Util    => 0,
 	},
 );

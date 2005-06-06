@@ -11,13 +11,14 @@
 
 package NEXT::init;
 
-our $VERSION = '0.99';
+our $VERSION = '0.99.2';
 
 use strict;
 use warnings;
 use Carp;
 
 use Symbol;
+use Scalar::Util qw( reftype );
 
 # debug output
 
@@ -48,9 +49,13 @@ use Data::Dumper;
 our $verbose = 0;
 our $debug   = 0;
 
-my %defaultz = map { $_ => 0 } qw( export type debug verbose );
-
-$defaultz{export} = 1;
+my %defaultz =
+qw(
+	export	1
+	type	0
+	debug	0
+	verbose	0
+);
 
 ########################################################################
 # utility subs to handle data on @_.
@@ -121,28 +126,49 @@ sub
 
 	my $class = ref $item || $item;
 
-	my $basetype = 
+	my $basetype =  
 	do
 	{
-		# metadata isn't blessed: its ref will be the
-		# correct type for comparison.
-
 		if( my $sub = $class->can('meta') )
 		{
+			# if this is derived from another N::i-based
+            # class then whatever its metadata type is 
+            # will be re-used here. $meta is extraneous
+            # but reftype $sub->() seems likely to leave
+            # anyone else crosseyed...
+
 			my $meta = $sub->();
 
-			ref $meta;
+			reftype $meta;
 		}
-		else
+		elsif( my $type = reftype $_[0] )
 		{
-			''
+            # if the caller passed in referent for the 
+            # first argument use its type if there isn't
+            # a base class to get it from.
+
+            $type
 		}
+        else
+        {
+            # passed a simple list: use whatever the list
+            # defines for itself via the :type (i.e., no 
+            # further sanity check on the basename).
+
+            ''
+        }
 	};
+
+    # now figure out the appropriate type for this new
+    # class: either it has passed a ref in $_[0], which
+    # means to use that type as the current metadata,
+    # or a simple list has been passed, which requires
+    # checking for :type argument or defaulting to HASH.
 
 	my $type = 
 	do
 	{
-		if( my $a = ref $_[0] )
+		if( my $a = reftype $_[0] )
 		{
 			if( @_ == 1 )
 			{
@@ -157,17 +183,9 @@ sub
 				{
 					$1
 				}
-				elsif( defined eval{ %{$_[0]} } )
+                else
 				{
-					'HASH'
-				}
-				elsif( defined eval{ @{$_[0]} } )
-				{
-					'ARRAY'
-				}
-				else
-				{
-					die "\nUnusable referent: not hash or array.\n";
+					die "\nUnusable referent: '$a' not hash or array.\n";
 				}
 			}
 			else
@@ -188,7 +206,7 @@ sub
 		}
 		else
 		{
-			croak<<'END'
+			die<<'END'
 Unable to determine base data type:
 The data arguments are not a referent and this 
 class is not derived from another type.
@@ -225,24 +243,33 @@ END
 # the stack has real data on it...
 #
 # all this does is expand a referent into a flat list.
+#
+# caller gets back whatever the argument list expands to.
 
 my $expandvaluz =
 sub
 {
-	my @a = ();
-
 	if( @_ == 1 )
 	{
-		eval { @a = @{ $_[0] } }
-		or
-		eval { @a = %{ $_[0] } }
+        my $type = reftype $_[0];
+
+        if( 'HASH' eq $type )
+        {
+            %{ $_[0] }
+        }
+        elsif( 'ARRAY' eq $type )
+        {
+            @{ $_[0] }
+        }
+        else
+        {
+            die "Bogus data type: '$type' neither hash nor array";
+        }
 	}
 	else
 	{
-		@a = @_
-	};
-
-	@a
+		@_
+	}
 };
 
 ########################################################################
@@ -353,6 +380,8 @@ sub import
 
 	my $argz = &$switches;
 
+	$DB::single = 1 if $debug;
+
 	# if things are getting exported to the caller class
 	# (vs. simply a use base) then build the typeglobs
 	# via symbol and populate them with ref's (data +
@@ -360,13 +389,10 @@ sub import
 
 	if( $argz->{export} )
 	{
-		$DB::single = 1 if $debug;
-
 		unshift @_, $caller;
 
-		# basetype is ARRAY or HASH.
-		# objtype is hash, queue, or stack.
-		# default array type is stack.
+		# basetype is ARRAY or HASH.  objtype is hash, queue,
+		# or stack.  default array type is stack.
 
 		my $basetype = &$objtype;
 
@@ -401,7 +427,7 @@ sub import
 		# where array types really matter.
 
 		*$const = $constructorz{ $argz->{type} }
-			unless defined *$const{CODE};
+			unless defined *{$const}{CODE};
 
 		if( $argz->{type} eq 'hash' )
 		{
