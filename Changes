@@ -1,5 +1,9 @@
 Most recent changes on top.
 
+Mon Jun  6 02:12:02 EDT 2005
+
+- Added README to the manifest...
+
 Sun Jun  5 22:29:59 EDT 2005
 
 - Replace eval's of datatypes to get base data type with

@@ -1,0 +1,18 @@
+Everyone's had to deal with some sort of data
+inheritence at one time or another. This was
+the answer I came up with after re-writing
+the process for myself a number of times.
+
+It uses NEXT to pass a empty, blessed referent
+through all of its base classes' init calls.
+Depending on the type of object (hash, queue,
+or stack) the process is done top-down or
+bottom up. 
+
+NEXT::init::install installs "construct" and 
+"init" subs in the callers space if they don't
+already exist, and installs %meta or @meta
+(depending on the base type). After that calls
+like $class->construct( @argz ) will produce
+a new object with the arguments overriding
+(or at the start/end) of the result.

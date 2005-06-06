@@ -3,10 +3,13 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
 	NAME            => 'NEXT::init',
-	VERSION         => '1.04',
+	VERSION         => '1.04.1',
 	ABSTRACT		=> <<'END',
 
-DWIM data inheritence for hashes and arrays.
+DWIM data inheritence for hashes and arrays for 
+simple object or ones with mutiple base classes.
+Handles sanity checks between class data types,
+default construct and init.
 
 END
 

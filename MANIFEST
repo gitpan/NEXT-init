@@ -1,5 +1,6 @@
 Changes
 MANIFEST
+README
 Makefile.PL
 lib/NEXT/init.pm
 test.pl
