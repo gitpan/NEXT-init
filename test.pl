@@ -28,8 +28,6 @@ use Data::Dumper;
 	$Data::Dumper::Deepcopy         = 0;
 	$Data::Dumper::Quotekeys        = 0;
 
-use FindBin::libs;
-
 use NEXT::init qw( :verbose=1 :debug=0 );
 
 my %baseline_hash = 
